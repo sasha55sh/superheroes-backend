@@ -2,19 +2,26 @@ const { cloudinary } = require("../config/config");
 const Superhero = require("../models/superheroModel");
 
 class ImagesService {
-  async updateImages(id, files, existingImages = []) {
+  async updateImages(id, files = [], existingImages = []) {
     const superhero = await Superhero.findById(id);
-    if (!superhero) throw new Error("Hero not found");
 
     let uploadedImages = [];
 
-    if (files && files.length > 0) {
-      const uploadResults = await Promise.all(
-        files.map((file) =>
-          cloudinary.uploader.upload(file.path, { folder: "superheroes" })
-        )
-      );
-      uploadedImages = uploadResults.map((res) => res.secure_url);
+    if (files.length > 0) {
+      const uploadFile = (file) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "superheroes" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result.secure_url);
+            }
+          );
+          stream.end(file.buffer);
+        });
+      };
+
+      uploadedImages = await Promise.all(files.map(uploadFile));
     }
 
     superhero.images = [...existingImages, ...uploadedImages].slice(0, 4);
