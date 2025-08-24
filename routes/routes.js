@@ -17,7 +17,11 @@ router.get("/catalog/:id", SuperheroController.getSuperheroById);
 
 router.delete("/catalog/:id", SuperheroController.deleteSuperheroById);
 
-router.post("/catalog/create", SuperheroController.createSuperhero);
+router.post(
+  "/catalog/create",
+  upload.array("newImages", 4),
+  SuperheroController.createSuperhero
+);
 
 router.put(
   "/catalog/:id",
