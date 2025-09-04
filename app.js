@@ -25,7 +25,6 @@ app.use(
     credentials: true,
     origin: [
       "http://localhost:3000",
-      "https://superheroes-backend.up.railway.app",
       "https://superheroes-db.vercel.app",
     ],
   })
